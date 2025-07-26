@@ -50,11 +50,11 @@ jobs:
         kubectl apply -f k8s/service.yaml
 
     - name: CML Report
-      uses: iterative/cml@v2
+      uses: iterative/cml@v0.16.2
       env:
         REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         report: |
           ## Deployment Report
           - Docker image: `${{ secrets.DOCKERHUB_USERNAME }}/iris-api:latest`
-          - Deployed to Kubernetes cluster
+          - Deployed to Kubernetes clusteir
