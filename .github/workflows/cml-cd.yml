@@ -44,11 +44,19 @@ jobs:
         # Install the plugin
         ./google-cloud-sdk/bin/gcloud components install gke-gcloud-auth-plugin --quiet
         echo "$(pwd)/google-cloud-sdk/bin" >> $GITHUB_PATH
-    - name: Set up Kubeconfig
-      run: |
-        mkdir -p $HOME/.kube
-        echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
 
+    - name: Authenticate to Google Cloud
+      env:
+        GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+      run: |
+        echo "$GCP_SA_KEY" > sa-key.json
+        ./google-cloud-sdk/bin/gcloud auth activate-service-account --key-file=sa-key.json
+        ./google-cloud-sdk/bin/gcloud config set project ferrous-iridium-461419-g0
+
+    - name: Get GKE credentials
+      run: |
+        ./google-cloud-sdk/bin/gcloud container clusters get-credentials iris-api --region us-central1
+        
     - name: Update k8s manifests with new image
       run: |
         sed -i "s|<DOCKER_IMAGE>|${{ secrets.DOCKERHUB_USERNAME }}/iris-api:latest|g" k8s/deployment.yaml
